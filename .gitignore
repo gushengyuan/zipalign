@@ -1,0 +1,5 @@
+*.apk
+*.exe
+zipalign
+__debug_bin
+
