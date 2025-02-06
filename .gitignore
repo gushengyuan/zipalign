@@ -1,5 +1,5 @@
 *.apk
 *.exe
-zipalign
+zipalign*
 __debug_bin
 

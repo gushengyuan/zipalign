@@ -98,7 +98,7 @@ go build -a
 
 solution: add cgo CFLAGS in zopfli.go
 ```
-#cgo CFLAGS: -I ../../src/zopfli
+#cgo CFLAGS: -I../../src/zopfli
 ```
 
 
@@ -110,9 +110,19 @@ clang: error: linker command failed with exit code 1 (use -v to see invocation)
 
 solution: add cgo LDFLAGS in zopfli.go
 ```
-#cgo LDFLAGS: -lzopfli -lm -L ../..
+#cgo LDFLAGS: -lzopfli -lm -L../..
 ```
 
+### CFLAGS and LDFLAGS doesn't work in zopfli.go
+using -x option to see build details
+```
+go build -x
+```
+
+you will see the new CFLAGS and LDFLAGS are not passed to the compiler, so we should clean the build cache
+```
+go clean --cache
+```
 
 ### problem: unknown option: -soname on macOS
 ```
@@ -123,6 +133,19 @@ clang: error: linker command failed with exit code 1 (use -v to see invocation)
 solution: change -soname to -install_name in Makefile
 ```
 sed -i "" 's/-soname/-install_name/g' Makefile
+```
+
+### how to build universal binary for macOS
+append "-arch x86_64 -arch arm64" to CFLAGS and LDFLAGS in Makefile
+```
+CGO_ENABLED=1 GOARCH=arm64 go build -o zipalign-arm64
+CGO_ENABLED=1 GOARCH=amd64 go build -o zipalign-x86_64
+lipo -create -output zipalign -arch x86_64 zipalign-x86_64 -arch arm64 zipalign-arm64
+```
+
+be remember to set CGO_ENABLED=1 whle building zipalign, or there will be error like this
+```
+github.com/google/zopfli/go/zopfli: build constraints exclude all Go files in /Users/xxx/go/pkg/mod/github.com/google/zopfli@v0.0.0-20210614151705-831773bc28e3/go/zopfli
 ```
 
 ### be remember to implement Zlib and Deflate in zopfli.go
