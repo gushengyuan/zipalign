@@ -108,7 +108,7 @@ ld: library not found for -lzopfli
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 ```
 
-solution: add cgo LDFLAGS in zopfli.go
+solution: replace cgo LDFLAGS in zopfli.go
 ```
 #cgo LDFLAGS: -lzopfli -lm -L../..
 ```
@@ -138,8 +138,8 @@ sed -i "" 's/-soname/-install_name/g' Makefile
 ### how to build universal binary for macOS
 append "-arch x86_64 -arch arm64" to CFLAGS and LDFLAGS in Makefile
 ```
-CGO_ENABLED=1 GOARCH=arm64 go build -o zipalign-arm64
-CGO_ENABLED=1 GOARCH=amd64 go build -o zipalign-x86_64
+CGO_ENABLED=1 GOARCH=arm64 go build -ldflags "-s" -o zipalign-arm64
+CGO_ENABLED=1 GOARCH=amd64 go build -ldflags "-s" -o zipalign-x86_64
 lipo -create -output zipalign -arch x86_64 zipalign-x86_64 -arch arm64 zipalign-arm64
 ```
 
